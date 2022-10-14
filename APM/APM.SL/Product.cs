@@ -31,36 +31,29 @@ namespace APM.SL
         /// <returns>Resulting profit margin</returns>
         public decimal CalculateMargin(string costInput, string priceInput)
         {
-            #region cost
+            decimal cost = ValidateInput(value: costInput, parameterName: nameof(Cost).ToLower(), acceptZero: true);
 
-            Guard.ThrowIfNullOrEmpty(argumentValue: costInput, message: "Please enter the cost", parameterName: "cost");
+            decimal price = ValidateInput(value: priceInput, parameterName: nameof(Price).ToLower());
 
-            bool costSuccess = decimal.TryParse(costInput, out decimal costOut);
+            const decimal total = 100M;
 
-            if (!costSuccess)
-                Guard.ThrowIfNotPositiveNonZeroDecimal(costInput, "The cost must be a number 0 or greater", "cost");
+            decimal margin = ((price - cost) / price) * total;
 
-            #endregion cost
-
-            #region price
-
-            Guard.ThrowIfNullOrEmpty(argumentValue: priceInput, message: "Please enter the price", parameterName: "price");
-            Guard.ThrowIfNotPositiveNonZeroDecimal(argumentValue: priceInput, message: "The price must be a number greater than 0", parameterName: "price");
-
-            bool priceSuccess = decimal.TryParse(priceInput, out decimal priceOut);
-
-            #endregion price
-
-            decimal margin = ((priceOut - costOut) / priceOut) * 100M;
-
-            return margin;
+            return Math.Round(margin);
         }
 
-        private decimal ValidateInput(string value, string message, string parameterName, bool acceptZero = false)
+        private decimal ValidateInput(string value, string parameterName, bool acceptZero = false)
         {
-            Guard.ThrowIfNullOrEmpty(argumentValue: value, message: $"Please enter a valid {parameterName}", parameterName: parameterName);
+            Guard.ThrowIfNullOrEmpty(argumentValue: value, message: $"Please enter the {parameterName}", parameterName: parameterName);
 
-            Guard.ThrowIfNotPositiveNonZeroDecimal(argumentValue: value, message: $"Please enter a valid {parameterName}", parameterName: parameterName);
+            if (acceptZero)
+            {
+                Guard.ThrowIfNotPositiveDecimal(argumentValue: value, message: $"The {parameterName} must be a number 0 or greater", parameterName: parameterName);
+            }
+            else
+            {
+                Guard.ThrowIfNotPositiveNonZeroDecimal(argumentValue: value, message: $"The {parameterName} must be a number greater than 0", parameterName: parameterName);
+            }
 
             bool success = decimal.TryParse(value, out decimal outValue);
 
