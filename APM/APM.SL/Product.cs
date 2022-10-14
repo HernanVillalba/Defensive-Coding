@@ -35,11 +35,7 @@ namespace APM.SL
 
             decimal price = ValidateInput(value: priceInput, parameterName: nameof(Price).ToLower());
 
-            const decimal total = 100M;
-
-            decimal margin = ((price - cost) / price) * total;
-
-            return Math.Round(margin);
+            return CalculateMargin(cost, price);
         }
 
         private decimal ValidateInput(string value, string parameterName, bool acceptZero = false)
@@ -58,9 +54,18 @@ namespace APM.SL
             bool success = decimal.TryParse(value, out decimal outValue);
 
             if (!success)
-                throw new ArgumentException(message: "Please enter a valid cost", paramName: parameterName);
+                throw new ArgumentException(message: $"Please enter a valid {parameterName}", paramName: parameterName);
 
             return outValue;
+        }
+
+        private decimal CalculateMargin(decimal cost, decimal price)
+        {
+            const decimal total = 100M;
+
+            decimal margin = ((price - cost) / price) * total;
+
+            return Math.Round(margin);
         }
 
         /// <summary>
